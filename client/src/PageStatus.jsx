@@ -5,19 +5,44 @@ function PageStatus() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const favicon = document.querySelector("link[rel='icon']");
+
+    const setFavicon = (iconPath) => {
+      if (favicon) {
+        favicon.href = iconPath;
+      } else {
+        const newFavicon = document.createElement("link");
+        newFavicon.rel = "icon";
+        newFavicon.href = iconPath;
+        document.head.appendChild(newFavicon);
+      }
+    };
+
+    const handleOnline = () => {
+      setIsOnline(true);
+      setFavicon("/vite.svg");
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setFavicon("/offline.svg");
+    };
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+
+    if (isOnline) {
+      setFavicon("/vite.svg");
+    } else {
+      setFavicon("/offline.svg");
+    }
 
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
+  }, [isOnline]);
 
-  // If online, don’t show the offline page
   if (isOnline)
     return (
       <>
